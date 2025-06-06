@@ -1,0 +1,24 @@
+let
+    Source = Folder.Files("C:\Users\rider\OneDrive\Documents\AEMO GBB\Energy Analysis\SWQP"),
+    #"Filtered Hidden Files1" = Table.SelectRows(Source, each [Attributes]?[Hidden]? <> true),
+    #"Invoke Custom Function1" = Table.AddColumn(#"Filtered Hidden Files1", "Transform File", each #"Transform File"([Content])),
+    #"Renamed Columns1" = Table.RenameColumns(#"Invoke Custom Function1", {"Name", "Source.Name"}),
+    #"Removed Other Columns1" = Table.SelectColumns(#"Renamed Columns1", {"Source.Name", "Transform File"}),
+    #"Expanded Table Column1" = Table.ExpandTableColumn(#"Removed Other Columns1", "Transform File", Table.ColumnNames(#"Transform File"(#"Sample File"))),
+    #"Changed Type" = Table.TransformColumnTypes(#"Expanded Table Column1",{{"Source.Name", type text}, {"GasDate", type date}, {"FacilityName", type text}, {"FacilityId", Int64.Type}, {"ConnectionPointName", type text}, {"ConnectionPointId", Int64.Type}, {"ActualQuantity", type number}, {"FlowDirection", type text}, {"State", type text}, {"LocationName", type text}, {"LocationId", Int64.Type}, {"Quality", type text}}),
+    #"Filtered Rows" = Table.SelectRows(#"Changed Type", each true),
+    #"Renamed Columns" = Table.RenameColumns(#"Filtered Rows",{{"FacilityName", "Facility Name"}, {"FacilityId", "Facility Id"}, {"GasDate", "Gas Date"}, {"ConnectionPointName", "Connection Point Name"}, {"ConnectionPointId", "Connection Point Id"}, {"ActualQuantity", "Actual Quantity"}, {"FlowDirection", "Flow Direction"}, {"LocationName", "Location Name"}, {"LocationId", "Location Id"}}),
+    #"Removed Columns" = Table.RemoveColumns(#"Renamed Columns",{"Quality"}),
+    #"Added Custom" = Table.AddColumn(#"Removed Columns", "Gas Year", each Date.Year([Gas Date])),
+    #"Filtered Rows1" = Table.SelectRows(#"Added Custom", each true),
+    #"Added Custom1" = Table.AddColumn(#"Filtered Rows1", "Gas Month", each Date.Month([Gas Date])),
+    #"Added Custom2" = Table.AddColumn(#"Added Custom1", "Gas Month Number", each Date.MonthName([Gas Date])),
+    #"Renamed Columns2" = Table.RenameColumns(#"Added Custom2",{{"Gas Month Number", "Gas Month Name"}}),
+    #"Added Custom3" = Table.AddColumn(#"Renamed Columns2", "Quarter", each Date.QuarterOfYear([Gas Date])),
+    #"Added Custom4" = Table.AddColumn(#"Added Custom3", "Day of Week", each Date.DayOfWeek([Gas Date])),
+    #"Added Custom5" = Table.AddColumn(#"Added Custom4", "Season", each if Date.Month([Gas Date]) >= 6 and Date.Month([Gas Date]) <= 8 then "Winter"
+else if Date.Month([Gas Date]) >= 12 or Date.Month([Gas Date]) <= 2 then "Summer"
+else "Other"),
+    #"Removed Columns1" = Table.RemoveColumns(#"Added Custom5",{"Source.Name"})
+in
+    #"Removed Columns1"

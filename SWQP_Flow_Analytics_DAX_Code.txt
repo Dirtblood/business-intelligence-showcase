@@ -1,0 +1,23 @@
+Average Daily SWQP Flow (TJ/day) = AVERAGE (SWQP[Actual Quantity])
+
+
+Other Average Flow (TJ/day) = 
+CALCULATE (
+    [Average Daily SWQP Flow (TJ/day)],
+    'SWQP'[Season] = "Other")
+
+
+Summer Average Flow (TJ/day) = 
+CALCULATE (
+    [Average Daily SWQP Flow (TJ/day)],
+    'SWQP'[Season] = "Summer"
+)
+
+
+Total SWQP Flow (TJ) = SUM ( SWQP[Actual Quantity])
+
+
+Winter Average Flow (TJ/day) = 
+CALCULATE (
+    [Average Daily SWQP Flow (TJ/day)],
+    'SWQP'[Season] = "Winter")
