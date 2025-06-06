@@ -15,13 +15,22 @@ Projects:
 This project visualises natural gas flow data from the AEMO South West Queensland Pipeline
 
 
-## 🔧 Tools & Languages
+Skills:
 - Power BI (DAX, M code)
 - SQL
 - Python (pandas)
 
 
 
+## 🔌 About Me
+
+I'm a data analyst with a deep interest in energy markets, particularly how data can be used to improve energy security, reduce waste, and support the transition to a more sustainable future.
+
+My work focuses on building business intelligence dashboards and analytics models that translate complex energy datasets into clear, actionable insights. I’ve worked with publicly available data from AEMO and other government platforms to create tools that track pipeline flow, production rates, and long-term trends in Australian energy infrastructure.
+
+Through this repository, I aim to showcase real-world applications of data analytics in the energy sector from gas flow monitoring to cost modeling for infrastructure development. My long-term goal is to support smarter decision-making in Australia's energy and resource markets using modern data tools.
+
+Whether you're a grid operator, analyst, or consultant, I hope this work helps inspire or support better energy outcomes.
 
 
 
