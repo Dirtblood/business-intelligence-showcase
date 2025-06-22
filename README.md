@@ -1,8 +1,8 @@
 # business-intelligence-showcase
-Case Studies Solving Economic Problems
+Case Studies Solving Economic Problems & Sports Performance Analytics
 # Business Intelligence Work – Nicholas Rider
 
-This repository contains my Power BI and data analytics projects, focused on the Australian energy and resources sector. All projects involve raw data transformation, M code development, DAX modeling, and dashboard design for real-world user cases.
+This repository contains my Power BI and data analytics projects, focused on the Australian energy and resources sector & sports performance analytics. All projects involve raw data transformation, M code development, DAX modeling, and dashboard design for real-world user cases.
 
 Projects:
 
@@ -15,6 +15,16 @@ Projects:
 This project visualises natural gas flow data from the AEMO South West Queensland Pipeline
 
 
+2. Hyrox Dashboard Analysing the Open Mens 35-39 Age Group (All races from 2021-2023)
+
+![image](https://github.com/user-attachments/assets/a38fe637-1b6f-4000-b593-873adbb7d055)
+
+![image](https://github.com/user-attachments/assets/12cf9fdc-cc1d-43c7-b0c2-0f42f3be19ba)
+
+This analysis tells a story of how to pace your race to achieve both average times and podium based times.
+
+
+
 Skills:
 - Power BI (DAX, M code)
 - SQL
@@ -24,14 +34,19 @@ Skills:
 
 ## 🔌 About Me
 
-I'm a data analyst with a deep interest in energy markets, particularly how data can be used to improve energy security, reduce waste, and support the transition to a more sustainable future.
+Hi, I'm Nicholas Rider — a data analyst and business strategist with a background in economics, energy, and mining.
 
-My work focuses on building business intelligence dashboards and analytics models that translate complex energy datasets into clear, actionable insights. I’ve worked with publicly available data from AEMO and other government platforms to create tools that track pipeline flow, production rates, and long-term trends in Australian energy infrastructure.
+I use **Power BI**, **DAX**, **Power Query (M)**, and **Python** to transform raw public and private data into decision-ready dashboards, insights, and systems. My projects focus on:
+- **Scaling the Australian mining sector**
+- **Solving housing affordability with modular home economics**
+- **Performance analytics** for elite events like **Hyrox** and **Swimming**
+- Automating workflows that combine open government datasets with business intelligence
 
-Through this repository, I aim to showcase real-world applications of data analytics in the energy sector from gas flow monitoring to cost modeling for infrastructure development. My long-term goal is to support smarter decision-making in Australia's energy and resource markets using modern data tools.
+I’m driven by impact — turning complex datasets into clarity, strategy, and results. Whether it’s helping mining executives forecast project timelines or building modular housing financial models, I bring precision, simplicity, and vision to every data problem.
 
-Whether you're a grid operator, analyst, or consultant, I hope this work helps inspire or support better energy outcomes.
+📹 Check out my  for walkthroughs and BI tutorials: https://www.youtube.com/@thebiedge
 
+🌏 Based in Australia, building globally
 
 
 
