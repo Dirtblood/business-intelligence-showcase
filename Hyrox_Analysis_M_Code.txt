@@ -1,0 +1,133 @@
+let
+    Source = Excel.Workbook(File.Contents("C:\Users\rider\OneDrive\Documents\Power BI\Hyrox Analysis.xlsx"), null, true),
+    Sheet1_Sheet = Source{[Item="Sheet1",Kind="Sheet"]}[Data],
+    #"Promoted Headers" = Table.PromoteHeaders(Sheet1_Sheet, [PromoteAllScalars=true]),
+    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"Event ID", type text}, {"Event Name", type text}, {"Season", Int64.Type}, {"Year", Int64.Type}, {"Gender 1", type text}, {"Location", type text}, {"Nationality", type text}, {"Age Group", type text}, {"Division 1", type text}, {"Total Time", type datetime}, {"Work Time", type datetime}, {"Rox Zone Time", type datetime}, {"Total Run Time", type datetime}, {"Run 1", type datetime}, {"Station 1", type datetime}, {"Rox Zone 1", type datetime}, {"Run 2", type datetime}, {"Station 2", type datetime}, {"Rox Zone 2", type datetime}, {"Run 3", type datetime}, {"Station 3", type datetime}, {"Rox Zone 3", type datetime}, {"Run 4", type datetime}, {"Station 4", type datetime}, {"Rox Zone 4", type datetime}, {"First Half Split", type datetime}, {"Run 5", type datetime}, {"Station 5", type datetime}, {"Rox Zone 5", type datetime}, {"Run 6", type datetime}, {"Station 6", type datetime}, {"Rox Zone 6", type datetime}, {"Run 7", type datetime}, {"Station 7", type datetime}, {"Rox Zone 7", type datetime}, {"Run 8", type datetime}, {"Station 8", type datetime}, {"Second Half Split", type datetime}}),
+
+    #"Removed Columns" = Table.RemoveColumns(#"Changed Type",{"Event Name", "Event ID", "Gender 1", "Division 1"}),
+    #"Changed Type1" = Table.TransformColumnTypes(#"Removed Columns",{{"Total Time", type time}, {"Work Time", type time}, {"Rox Zone Time", type time}, {"Total Run Time", type time}, {"Run 1", type time}, {"Station 1", type time}, {"Rox Zone 1", type time}, {"Run 2", type time}, {"Station 2", type time}, {"Rox Zone 2", type time}, {"Run 3", type time}, {"Station 3", type time}, {"Rox Zone 3", type time}, {"Run 4", type time}, {"Station 4", type time}, {"Rox Zone 4", type time}, {"First Half Split", type time}, {"Run 5", type time}, {"Station 5", type time}, {"Rox Zone 5", type time}, {"Run 6", type time}, {"Station 6", type time}, {"Rox Zone 6", type time}, {"Run 7", type time}, {"Station 7", type time}, {"Rox Zone 7", type time}, {"Run 8", type time}, {"Station 8", type time}, {"Second Half Split", type time}}),
+    #"Added Custom" = Table.AddColumn(#"Changed Type1", "Custom", each if Value.Is([roxzone_time], type time) then 
+    Duration.TotalMinutes([roxzone_time] - #time(0, 0, 0)) 
+else 
+    null),
+    #"Removed Columns1" = Table.RemoveColumns(#"Added Custom",{"Custom"}),
+    #"Added Custom1" = Table.AddColumn(#"Removed Columns1", "Custom", each if Value.Is([Total Time], type time) then 
+    Duration.TotalMinutes([Total Time] - #time(0, 0, 0)) 
+else 
+    null),
+    #"Renamed Columns" = Table.RenameColumns(#"Added Custom1",{{"Custom", "Total Time 1"}}),
+    #"Rounded Up" = Table.TransformColumns(#"Renamed Columns",{{"Total Time 1", Number.RoundUp, Int64.Type}}),
+    #"Renamed Columns1" = Table.RenameColumns(#"Rounded Up",{{"Total Time 1", "Total Time (Minutes)"}}),
+    #"Removed Columns2" = Table.RemoveColumns(#"Renamed Columns1",{"Total Time"}),
+    #"Added Custom2" = Table.AddColumn(#"Removed Columns2", "Work Time.1", each if Value.Is([Work Time], type time) then 
+    Duration.TotalMinutes([Work Time] - #time(0, 0, 0)) 
+else 
+    null),
+    #"Rounded Up1" = Table.TransformColumns(#"Added Custom2",{{"Work Time.1", Number.RoundUp, Int64.Type}}),
+    #"Renamed Columns2" = Table.RenameColumns(#"Rounded Up1",{{"Work Time.1", "Station Work Time Total"}}),
+    #"Removed Columns3" = Table.RemoveColumns(#"Renamed Columns2",{"Work Time"}),
+    #"Added Custom3" = Table.AddColumn(#"Removed Columns3", "Custom", each if Value.Is([Rox Zone Time], type time) then 
+    Duration.TotalMinutes([Rox Zone Time] - #time(0, 0, 0)) 
+else 
+    null),
+    #"Renamed Columns3" = Table.RenameColumns(#"Added Custom3",{{"Custom", "Total Rox Zone Time"}}),
+    #"Rounded Up2" = Table.TransformColumns(#"Renamed Columns3",{{"Total Rox Zone Time", Number.RoundUp, Int64.Type}}),
+    #"Removed Columns4" = Table.RemoveColumns(#"Rounded Up2",{"Rox Zone Time"}),
+    #"Added Custom4" = Table.AddColumn(#"Removed Columns4", "Custom", each if Value.Is([Total Run Time], type time) then 
+    Duration.TotalMinutes([Total Run Time] - #time(0, 0, 0)) 
+else 
+    null),
+    #"Rounded Up3" = Table.TransformColumns(#"Added Custom4",{{"Custom", Number.RoundUp, Int64.Type}}),
+    #"Renamed Columns4" = Table.RenameColumns(#"Rounded Up3",{{"Custom", "Total Run Time (mins)"}}),
+    #"Added Custom5" = Table.AddColumn(#"Renamed Columns4", "Total Run Time Mins", each if Value.Is([Total Run Time], type time) then 
+    Duration.TotalMinutes([Total Run Time] - #time(0, 0, 0)) 
+else 
+    null),
+    #"Rounded Up4" = Table.TransformColumns(#"Added Custom5",{{"Total Run Time Mins", Number.RoundUp, Int64.Type}}),
+    #"Removed Columns5" = Table.RemoveColumns(#"Rounded Up4",{"Total Run Time", "Total Run Time Mins"}),
+    #"Added Custom6" = Table.AddColumn(#"Removed Columns5", "Custom", each if Value.Is([Run 1], type time) then 
+    Duration.TotalMinutes([Run 1] - #time(0, 0, 0)) 
+else 
+    null),
+    #"Renamed Columns5" = Table.RenameColumns(#"Added Custom6",{{"Custom", "Run 1 (mins)"}}),
+    #"Rounded Up5" = Table.TransformColumns(#"Renamed Columns5",{{"Run 1 (mins)", Number.RoundUp, Int64.Type}}),
+    #"Removed Columns6" = Table.RemoveColumns(#"Rounded Up5",{"Run 1"}),
+    #"Added Custom7" = Table.AddColumn(#"Removed Columns6", "Ski Erg (mins)", each if Value.Is([Station 1], type time) then 
+    Duration.TotalMinutes([Station 1] - #time(0, 0, 0)) 
+else 
+    null),
+    #"Rounded Up6" = Table.TransformColumns(#"Added Custom7",{{"Ski Erg (mins)", Number.RoundUp, Int64.Type}}),
+    #"Removed Columns7" = Table.RemoveColumns(#"Rounded Up6",{"Station 1", "Rox Zone 1"}),
+    #"Added Custom8" = Table.AddColumn(#"Removed Columns7", "Run 2 (mins)", each if Value.Is([Run 2], type time) then 
+    Duration.TotalMinutes([Run 2] - #time(0, 0, 0)) 
+else 
+    null),
+    #"Calculated Absolute Value" = Table.TransformColumns(#"Added Custom8",{{"Run 2 (mins)", Number.Abs, type number}}),
+    #"Rounded Up7" = Table.TransformColumns(#"Calculated Absolute Value",{{"Run 2 (mins)", Number.RoundUp, Int64.Type}}),
+    #"Removed Columns8" = Table.RemoveColumns(#"Rounded Up7",{"Run 2"}),
+    #"Added Custom9" = Table.AddColumn(#"Removed Columns8", "Custom", each if Value.Is([Station 2], type time) then 
+    Duration.TotalMinutes[Station 2] - #time(0, 0, 0) 
+else 
+    null),
+    #"Removed Columns9" = Table.RemoveColumns(#"Added Custom9",{"Custom"}),
+    #"Added Custom10" = Table.AddColumn(#"Removed Columns9", "Station 2 (mins)", each if [Station 2] <> null then Duration.TotalMinutes([Station 2] - #time(0,0,0)) else null),
+    #"Changed Type2" = Table.TransformColumnTypes(#"Added Custom10",{{"Run 2 (mins)", Int64.Type}, {"Station 2 (mins)", Int64.Type}, {"Ski Erg (mins)", Int64.Type}, {"Run 1 (mins)", Int64.Type}}),
+    #"Removed Columns10" = Table.RemoveColumns(#"Changed Type2",{"Station 2"}),
+    #"Added Custom11" = Table.AddColumn(#"Removed Columns10", "Rox Zone 2.1", each if [Rox Zone 2] <> null then Duration.TotalMinutes([Rox Zone 2] - #time(0,0,0)) else null),
+    #"Changed Type3" = Table.TransformColumnTypes(#"Added Custom11",{{"Rox Zone 2.1", Int64.Type}}),
+    #"Removed Columns11" = Table.RemoveColumns(#"Changed Type3",{"Rox Zone 2"}),
+    #"Added Custom12" = Table.AddColumn(#"Removed Columns11", "Custom", each if [Run 3] <> null then Duration.TotalMinutes([Run 3] - #time(0,0,0)) else null),
+    #"Renamed Columns6" = Table.RenameColumns(#"Added Custom12",{{"Custom", "Run 3 (mins)"}}),
+    #"Changed Type4" = Table.TransformColumnTypes(#"Renamed Columns6",{{"Run 3 (mins)", Int64.Type}}),
+    #"Removed Columns12" = Table.RemoveColumns(#"Changed Type4",{"Run 3"}),
+    #"Added Custom13" = Table.AddColumn(#"Removed Columns12", "Sled Pull", each if [Station 3] <> null then Duration.TotalMinutes([Station 3] - #time(0,0,0)) else null),
+    #"Changed Type5" = Table.TransformColumnTypes(#"Added Custom13",{{"Sled Pull", Int64.Type}}),
+    #"Removed Columns13" = Table.RemoveColumns(#"Changed Type5",{"Station 3"}),
+    #"Added Custom14" = Table.AddColumn(#"Removed Columns13", "Custom", each if [Rox Zone 3] <> null then Duration.TotalMinutes([Rox Zone 3] - #time(0,0,0)) else null),
+    #"Renamed Columns7" = Table.RenameColumns(#"Added Custom14",{{"Custom", "Rox Zone 3 (mins)"}}),
+    #"Changed Type6" = Table.TransformColumnTypes(#"Renamed Columns7",{{"Rox Zone 3 (mins)", Int64.Type}}),
+    #"Removed Columns14" = Table.RemoveColumns(#"Changed Type6",{"Rox Zone 3"}),
+    #"Added Custom15" = Table.AddColumn(#"Removed Columns14", "Run 4 (mins)", each if [Run 4] <> null then Duration.TotalMinutes([Run 4] - #time(0,0,0)) else null),
+    #"Changed Type7" = Table.TransformColumnTypes(#"Added Custom15",{{"Run 4 (mins)", Int64.Type}}),
+    #"Removed Columns15" = Table.RemoveColumns(#"Changed Type7",{"Run 4"}),
+    #"Added Custom16" = Table.AddColumn(#"Removed Columns15", "Burpee Broad Jumps", each if [Station 4] <> null then Duration.TotalMinutes([Station 4] - #time(0,0,0)) else null),
+    #"Changed Type8" = Table.TransformColumnTypes(#"Added Custom16",{{"Burpee Broad Jumps", Int64.Type}}),
+    #"Removed Columns16" = Table.RemoveColumns(#"Changed Type8",{"Station 4"}),
+    #"Added Custom17" = Table.AddColumn(#"Removed Columns16", "Rox Zone 4 (mins)", each if [Rox Zone 4] <> null then Duration.TotalMinutes([Rox Zone 4] - #time(0,0,0)) else null),
+    #"Changed Type9" = Table.TransformColumnTypes(#"Added Custom17",{{"Rox Zone 4 (mins)", Int64.Type}}),
+    #"Removed Columns17" = Table.RemoveColumns(#"Changed Type9",{"Rox Zone 4"}),
+    #"Added Custom18" = Table.AddColumn(#"Removed Columns17", "First Half Split (mins)", each if [First Half Split] <> null then Duration.TotalMinutes([First Half Split] - #time(0,0,0)) else null),
+    #"Changed Type10" = Table.TransformColumnTypes(#"Added Custom18",{{"First Half Split (mins)", Int64.Type}}),
+    #"Removed Columns18" = Table.RemoveColumns(#"Changed Type10",{"First Half Split"}),
+    #"Added Custom19" = Table.AddColumn(#"Removed Columns18", "Run 5 (mins)", each if [Run 5] <> null then Duration.TotalMinutes([Run 5] - #time(0,0,0)) else null),
+    #"Changed Type11" = Table.TransformColumnTypes(#"Added Custom19",{{"Run 5 (mins)", Int64.Type}}),
+    #"Removed Columns19" = Table.RemoveColumns(#"Changed Type11",{"Run 5"}),
+    #"Added Custom20" = Table.AddColumn(#"Removed Columns19", "Rower", each if [Station 5] <> null then Duration.TotalMinutes([Station 5] - #time(0,0,0)) else null),
+    #"Changed Type12" = Table.TransformColumnTypes(#"Added Custom20",{{"Rower", Int64.Type}}),
+    #"Removed Columns20" = Table.RemoveColumns(#"Changed Type12",{"Station 5", "Rox Zone 5", "Rox Zone 3 (mins)", "Rox Zone 2.1"}),
+    #"Added Custom21" = Table.AddColumn(#"Removed Columns20", "Run 6 (mins)", each if [Run 6] <> null then Duration.TotalMinutes([Run 6] - #time(0,0,0)) else null),
+    #"Changed Type13" = Table.TransformColumnTypes(#"Added Custom21",{{"Run 6 (mins)", Int64.Type}}),
+    #"Removed Columns21" = Table.RemoveColumns(#"Changed Type13",{"Run 6"}),
+    #"Added Custom22" = Table.AddColumn(#"Removed Columns21", "Farmers Carries", each if [Station 6] <> null then Duration.TotalMinutes([Station 6] - #time(0,0,0)) else null),
+    #"Changed Type14" = Table.TransformColumnTypes(#"Added Custom22",{{"Farmers Carries", Int64.Type}}),
+    #"Removed Columns22" = Table.RemoveColumns(#"Changed Type14",{"Station 6", "Rox Zone 6"}),
+    #"Added Custom23" = Table.AddColumn(#"Removed Columns22", "Run 7 (mins)", each if [Run 7] <> null then Duration.TotalMinutes([Run 7] - #time(0,0,0)) else null),
+    #"Changed Type15" = Table.TransformColumnTypes(#"Added Custom23",{{"Run 7 (mins)", Int64.Type}}),
+    #"Removed Columns23" = Table.RemoveColumns(#"Changed Type15",{"Run 7"}),
+    #"Added Custom24" = Table.AddColumn(#"Removed Columns23", "Sandbag Lunges", each if [Station 7] <> null then Duration.TotalMinutes([Station 7] - #time(0,0,0)) else null),
+    #"Changed Type16" = Table.TransformColumnTypes(#"Added Custom24",{{"Sandbag Lunges", Int64.Type}}),
+    #"Removed Columns24" = Table.RemoveColumns(#"Changed Type16",{"Station 7", "Rox Zone 7"}),
+    #"Added Custom25" = Table.AddColumn(#"Removed Columns24", "Run 8 (mins)", each if [Run 8] <> null then Duration.TotalMinutes([Run 8] - #time(0,0,0)) else null),
+    #"Changed Type17" = Table.TransformColumnTypes(#"Added Custom25",{{"Run 8 (mins)", Int64.Type}}),
+    #"Removed Columns25" = Table.RemoveColumns(#"Changed Type17",{"Run 8"}),
+    #"Added Custom26" = Table.AddColumn(#"Removed Columns25", "Wall Balls", each if [Station 8] <> null then Duration.TotalMinutes([Station 8] - #time(0,0,0)) else null),
+    #"Changed Type18" = Table.TransformColumnTypes(#"Added Custom26",{{"Wall Balls", Int64.Type}}),
+    #"Removed Columns26" = Table.RemoveColumns(#"Changed Type18",{"Station 8"}),
+    #"Added Custom27" = Table.AddColumn(#"Removed Columns26", "Second Half Split (mins)", each if [Second Half Split] <> null then Duration.TotalMinutes([Second Half Split] - #time(0,0,0)) else null),
+    #"Changed Type19" = Table.TransformColumnTypes(#"Added Custom27",{{"Second Half Split (mins)", Int64.Type}}),
+    #"Removed Columns27" = Table.RemoveColumns(#"Changed Type19",{"Second Half Split"}),
+    #"Renamed Columns8" = Table.RenameColumns(#"Removed Columns27",{{"Total Time (Minutes)", "Total Time"}, {"Station Work Time Total", "Total Station Time"}, {"Total Run Time (mins)", "Total Run Time"}, {"Run 1 (mins)", "Run 1"}, {"Ski Erg (mins)", "Ski Erg"}, {"Run 2 (mins)", "Run 2"}, {"Station 2 (mins)", "Sled Push"}, {"Run 3 (mins)", "Run 3"}, {"Run 4 (mins)", "Run 4"}}),
+    #"Removed Columns28" = Table.RemoveColumns(#"Renamed Columns8",{"Rox Zone 4 (mins)"}),
+    #"Renamed Columns9" = Table.RenameColumns(#"Removed Columns28",{{"First Half Split (mins)", "First Half Split"}, {"Run 5 (mins)", "Run 5"}, {"Run 6 (mins)", "Run 6"}, {"Run 7 (mins)", "Run 7"}, {"Run 8 (mins)", "Run 8"}, {"Second Half Split (mins)", "Second Half Split"}})
+in
+    #"Renamed Columns9"
