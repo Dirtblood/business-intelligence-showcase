@@ -1,0 +1,40 @@
+Top10FastestTimes = 
+VAR Top10Table =
+    TOPN(10, 
+        ADDCOLUMNS(
+            'Sheet1', 
+            "TotalTimeValue", 'Sheet1'[Total Time]
+        ), 
+        [TotalTimeValue], 
+        ASC
+    )
+VAR WithRank =
+    ADDCOLUMNS(
+        Top10Table,
+        "Rank", 
+        RANKX(Top10Table, [TotalTimeValue], , ASC)
+    )
+RETURN
+    SELECTCOLUMNS(
+        WithRank,
+        "Rank", [Rank],
+        "Athlete", 'Sheet1'[Age Group],  -- Replace with Name or ID if available
+        "Total Time", [TotalTimeValue]
+    )
+
+
+
+Top3FastestByLocation = 
+VAR AddRanks =
+    ADDCOLUMNS(
+        'Sheet1',
+        "RankInLocation",
+        RANKX(
+            FILTER('Sheet1', 'Sheet1'[Location] = EARLIER('Sheet1'[Location])),
+            'Sheet1'[Total Time],
+            ,
+            ASC
+        )
+    )
+RETURN
+    FILTER(AddRanks, [RankInLocation] <= 3)
