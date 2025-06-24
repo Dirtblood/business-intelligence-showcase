@@ -71,7 +71,7 @@ I use **Power BI**, **DAX**, **Power Query (M)**, and **Python** to transform ra
 
 I’m driven by impact — turning complex datasets into clarity, strategy, and results. Whether it’s helping mining executives forecast project timelines or building modular housing financial models, I bring precision, simplicity, and vision to every data problem.
 
-📹 Check out my  for walkthroughs and BI tutorials: https://www.youtube.com/@thebiedge
+📹 Check out my YouTube channel for walkthroughs and BI tutorials: https://www.youtube.com/@thebiedge
 
 🌏 Based in Australia, building globally
 
