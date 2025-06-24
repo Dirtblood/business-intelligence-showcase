@@ -1,0 +1,36 @@
+let
+    Source = Excel.Workbook(File.Contents("C:\Users\rider\OneDrive\Documents\Power BI\SA Petroleum\SA Petroleum Raw Data.xlsx"), null, true),
+    #"Active Petroleum - Leases_Sheet" = Source{[Item="Active Petroleum - Leases",Kind="Sheet"]}[Data],
+    #"Promoted Headers" = Table.PromoteHeaders(#"Active Petroleum - Leases_Sheet", [PromoteAllScalars=true]),
+    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"X", type number}, {"Y", type number}, {"CALL_NO", type any}, {"FILE_REF", type text}, {"LICENSEE", type text}, {"GRANT_DATE", type datetime}, {"EXPIR_DATE", type datetime}, {"AREA_KM2", type number}, {"NO_BLOCKS", Int64.Type}, {"LABEL", type text}, {"STATUS", type text}, {"ACT", type text}}),
+    #"Removed Columns" = Table.RemoveColumns(#"Changed Type",{"CALL_NO", "FILE_REF"}),
+    #"Renamed Columns" = Table.RenameColumns(#"Removed Columns",{{"LICENSEE", "Operator"}}),
+    #"Added Custom" = Table.AddColumn(#"Renamed Columns", "Grant Year", each Date.Year([GRANT_DATE])),
+    #"Added Custom1" = Table.AddColumn(#"Added Custom", "Grant Month", each Date.MonthName([GRANT_DATE])),
+    #"Added Custom2" = Table.AddColumn(#"Added Custom1", "Custom", each if Date.Month([GRANT_DATE]) >= 7 then 
+        Text.From(Date.Year([GRANT_DATE])) & "/" & Text.End(Text.From(Date.Year([GRANT_DATE]) + 1), 2) 
+    else 
+        Text.From(Date.Year([GRANT_DATE]) - 1) & "/" & Text.End(Text.From(Date.Year([GRANT_DATE])), 2)),
+    #"Renamed Columns1" = Table.RenameColumns(#"Added Custom2",{{"Custom", "Granted Date - Financial Year"}}),
+    #"Added Custom3" = Table.AddColumn(#"Renamed Columns1", "Granted Date - Calendar Year", each Date.QuarterOfYear([GRANT_DATE])),
+    #"Renamed Columns2" = Table.RenameColumns(#"Added Custom3",{{"Granted Date - Calendar Year", "Granted Date - Calendar Year Month"}}),
+    #"Removed Columns1" = Table.RemoveColumns(#"Renamed Columns2",{"Granted Date - Calendar Year Month", "GRANT_DATE", "X", "Y"}),
+    #"Renamed Columns3" = Table.RenameColumns(#"Removed Columns1",{{"LABEL", "Lease Number"}}),
+    #"Removed Columns2" = Table.RemoveColumns(#"Renamed Columns3",{"STATUS", "ACT"}),
+    #"Renamed Columns4" = Table.RenameColumns(#"Removed Columns2",{{"Granted Date - Financial Year", "Granted - Financial Year"}}),
+    #"Removed Columns3" = Table.RemoveColumns(#"Renamed Columns4",{"NO_BLOCKS"}),
+    #"Renamed Columns5" = Table.RenameColumns(#"Removed Columns3",{{"AREA_KM2", "Total Lease Area Sqkm"}}),
+    #"Removed Duplicates" = Table.Distinct(#"Renamed Columns5", {"Lease Number"}),
+    #"Changed Type1" = Table.TransformColumnTypes(#"Removed Duplicates",{{"Total Lease Area Sqkm", Int64.Type}}),
+    #"Renamed Columns6" = Table.RenameColumns(#"Changed Type1",{{"Operator", "Operator - Lease Holder"}, {"Total Lease Area Sqkm", "Total SQKM"}}),
+    #"Added Custom4" = Table.AddColumn(#"Renamed Columns6", "Expiry Year", each Date.Year([EXPIR_DATE])),
+    #"Added Custom5" = Table.AddColumn(#"Added Custom4", "Expiry Month", each Date.MonthName([EXPIR_DATE])),
+    #"Added Custom6" = Table.AddColumn(#"Added Custom5", "Expiry - Financial Year", each if Date.Month([EXPIR_DATE]) >= 7 then 
+        Text.From(Date.Year([EXPIR_DATE])) & "/" & Text.End(Text.From(Date.Year([EXPIR_DATE]) + 1), 2) 
+    else 
+        Text.From(Date.Year([EXPIR_DATE]) - 1) & "/" & Text.End(Text.From(Date.Year([EXPIR_DATE])), 2)),
+    #"Filtered Rows" = Table.SelectRows(#"Added Custom6", each [Expiry Month] <> null and [Expiry Month] <> ""),
+    #"Removed Columns4" = Table.RemoveColumns(#"Filtered Rows",{"EXPIR_DATE"}),
+    #"Renamed Columns7" = Table.RenameColumns(#"Removed Columns4",{{"Grant Month", "Granted Month"}, {"Grant Year", "Granted Year"}})
+in
+    #"Renamed Columns7"
