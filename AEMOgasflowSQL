@@ -1,0 +1,163 @@
+AEMO SQL Queries 
+
+
+AEMO Monthly Flow Trends***
+
+SELECT 
+    FORMAT([GasDate], 'yyyy-MM') AS Month,
+    SUM([ActualQuantity]) AS Total_Quantity
+FROM 
+    [PipelineConnectionFlow_History]
+GROUP BY 
+    FORMAT([GasDate], 'yyyy-MM')
+ORDER BY 
+    Month;
+
+
+Facility Location Pair Total***
+
+SELECT 
+    [FacilityName],
+    [LocationName],
+    SUM([ActualQuantity]) AS Total_Quantity
+FROM 
+    [PipelineConnectionFlow_History]
+GROUP BY 
+    [FacilityName], [LocationName]
+ORDER BY 
+    Total_Quantity DESC;
+
+
+Inflow vs Outflow Volume***
+
+SELECT 
+    [FlowDirection],
+    SUM([ActualQuantity]) AS Total_Quantity
+FROM 
+    [PipelineConnectionFlow_History]
+GROUP BY 
+    [FlowDirection];
+
+
+
+Period In The Dataset***
+
+SELECT 
+    MIN([GasDate]) AS StartDate,
+    MAX([GasDate]) AS EndDate,
+    DATEDIFF(DAY, MIN([GasDate]), MAX([GasDate])) AS DurationDays
+FROM 
+    [PipelineConnectionFlow_History];
+
+
+
+
+Cleaning Duplicates from the Master Table for Power BI***
+
+
+SELECT 
+    GasDate,
+    FacilityName,
+    FacilityId,
+    ConnectionPointName,
+    ConnectionPointId,
+    ActualQuantity,
+    FlowDirection,
+    State,
+    LocationName,
+    LocationId,
+    Quality,
+    COUNT(*) AS DuplicateCount
+FROM dbo.PipelineConnectionFlows_Master
+WHERE YEAR(GasDate) = 
+GROUP BY 
+    GasDate,
+    FacilityName,
+    FacilityId,
+    ConnectionPointName,
+    ConnectionPointId,
+    ActualQuantity,
+    FlowDirection,
+    State,
+    LocationName,
+    LocationId,
+    Quality
+HAVING COUNT(*) > 1
+ORDER BY DuplicateCount DESC;
+
+
+
+Looking at Pipeline Flow Summary***
+
+
+SELECT
+    FacilityName,
+    ROUND(AVG(ActualQuantity), 2) AS avg_flow_rate,
+    ROUND(SUM(ActualQuantity), 2) AS total_flow_rate
+INTO
+    NewPipelineFlowSummary -- Specifies the new table name
+FROM
+    dbo.PipelineConnectionFlows_Master
+WHERE
+    GasDate >= '2019-01-01'
+    AND GasDate <= '2020-12-31'
+    AND ActualQuantity IS NOT NULL
+GROUP BY
+    FacilityName;
+
+
+Create a Master Table for Power BI***
+
+CREATE TABLE dbo.PipelineConnectionFlows_Master (
+    [GasDate] date NULL,
+    [FacilityName] nvarchar(100) NULL,
+    [FacilityId] int NULL,
+    [ConnectionPointName] nvarchar(255) NULL,
+    [ConnectionPointId] int NULL,
+    [ActualQuantity] decimal(18, 4) NULL,
+    [FlowDirection] nvarchar(100) NULL,
+    [State] nvarchar(100) NULL,
+    [LocationName] nvarchar(100) NULL,
+    [LocationId] int NULL,
+    [Quality] nvarchar(100) NULL
+);
+
+
+Connect Data into Master Table***
+
+INSERT INTO dbo.PipelineConnectionFlows_Master
+SELECT * FROM dbo.PipelineConnectionFlow20182019
+UNION ALL
+SELECT * FROM dbo.PipelineConnectionFlow2020
+UNION ALL
+SELECT * FROM dbo.PipelineConnectionFlow2021
+UNION ALL
+SELECT * FROM dbo.PipelineConnectionFlow2022
+UNION ALL
+SELECT * FROM dbo.PipelineConnectionFlow2023
+UNION ALL
+SELECT * FROM dbo.PipelineConnectionFlow2024;
+
+
+
+Drop Duplicates from 2023 that were supposed to be the 2022 dataset***
+
+WITH CTE AS (
+    SELECT *,
+           ROW_NUMBER() OVER (
+               PARTITION BY GasDate, FacilityName, ConnectionPointName, ActualQuantity
+               ORDER BY (SELECT NULL)
+           ) AS RowNum
+    FROM dbo.PipelineConnectionFlows_Master
+    WHERE YEAR(GasDate) = 2023
+)
+DELETE FROM CTE
+WHERE RowNum > 1;
+
+
+
+
+
+
+
+
